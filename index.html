@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Time Tracker</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f5f6f8; color: #1a1d21;
+    display: flex; justify-content: center;
+  }
+  main { width: 100%; max-width: 900px; }
+  h1 { font-size: 20px; margin: 0 0 16px; }
+  .row { display: flex; gap: 8px; }
+  input[type="text"] {
+    flex: 1; min-width: 0; padding: 12px 14px; font-size: 16px;
+    border: 1px solid #c8ccd2; border-radius: 8px; background: #fff; color: inherit;
+  }
+  input[type="text"]:focus { outline: 2px solid #3b82f6; outline-offset: -1px; }
+  input[type="text"]:disabled { background: #eef0f3; color: #6b7280; }
+  button {
+    font: inherit; cursor: pointer; border: 0; border-radius: 8px;
+    padding: 12px 20px; font-weight: 600; font-size: 15px;
+  }
+  #toggle { min-width: 132px; background: #16a34a; color: #fff; }
+  #toggle.stop { background: #dc2626; }
+  .toolbar { display: flex; gap: 8px; margin: 20px 0 8px; align-items: center; }
+  .toolbar button { background: #e5e7eb; color: #1a1d21; padding: 8px 14px; font-size: 14px; }
+  #status { font-size: 14px; color: #6b7280; margin-left: auto; white-space: nowrap; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eceef1; font-size: 14px; }
+  th { background: #f0f1f4; font-weight: 600; }
+  td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.action, th.action { width: 44px; text-align: right; }
+  tr:last-child td { border-bottom: 0; }
+  .del { background: none; color: #9ca3af; padding: 4px 8px; font-size: 18px; line-height: 1; }
+  .del:hover { color: #dc2626; }
+  .empty { padding: 24px; text-align: center; color: #9ca3af; font-size: 14px; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #16181c; color: #e6e8eb; }
+    input[type="text"] { background: #1e2126; border-color: #34383f; }
+    input[type="text"]:disabled { background: #22252a; color: #8b9198; }
+    table { background: #1e2126; }
+    th { background: #24272d; }
+    th, td { border-color: #2b2f35; }
+    .toolbar button { background: #2b2f35; color: #e6e8eb; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Time Tracker</h1>
+
+  <div class="row">
+    <input id="task" type="text" placeholder="What are you working on?" autocomplete="off" aria-label="Task name">
+    <button id="toggle" type="button">Start</button>
+  </div>
+
+  <div class="toolbar">
+    <button id="copy" type="button">Copy for Excel</button>
+    <button id="clear" type="button">Clear all</button>
+    <span id="status"></span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th class="num">Start</th>
+        <th class="num">Stop</th>
+        <th class="num">Duration</th>
+        <th class="action"></th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div id="empty" class="empty">No entries yet — type a task and press Start.</div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var ENTRIES_KEY = 'time-tracker.entries.v1';
+  var RUNNING_KEY = 'time-tracker.running.v1';
+
+  var taskInput = document.getElementById('task');
+  var toggleBtn = document.getElementById('toggle');
+  var rowsBody = document.getElementById('rows');
+  var emptyMsg = document.getElementById('empty');
+  var statusEl = document.getElementById('status');
+  var copyBtn = document.getElementById('copy');
+  var clearBtn = document.getElementById('clear');
+
+  var entries = read(ENTRIES_KEY, []);
+  var running = read(RUNNING_KEY, null);
+
+  function read(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw === null ? fallback : JSON.parse(raw);
+    } catch (err) {
+      return fallback;
+    }
+  }
+
+  function write() {
+    try {
+      localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries));
+      localStorage.setItem(RUNNING_KEY, JSON.stringify(running));
+    } catch (err) {
+      setStatus('Could not save (storage blocked)');
+    }
+  }
+
+  function uid() {
+    if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function fmtDateTime(ms) {
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+
+  function fmtDuration(ms) {
+    var total = Math.max(0, Math.floor(ms / 1000));
+    var h = Math.floor(total / 3600);
+    var m = Math.floor((total % 3600) / 60);
+    var s = total % 60;
+    return pad(h) + ':' + pad(m) + ':' + pad(s);
+  }
+
+  function clean(text) {
+    return String(text).replace(/[\t\r\n]+/g, ' ').trim();
+  }
+
+  function render() {
+    rowsBody.textContent = '';
+
+    entries.forEach(function (entry) {
+      var tr = document.createElement('tr');
+
+      var taskCell = document.createElement('td');
+      taskCell.textContent = entry.task;
+      tr.appendChild(taskCell);
+
+      var startCell = document.createElement('td');
+      startCell.className = 'num';
+      startCell.textContent = fmtDateTime(entry.start);
+      tr.appendChild(startCell);
+
+      var stopCell = document.createElement('td');
+      stopCell.className = 'num';
+      stopCell.textContent = fmtDateTime(entry.stop);
+      tr.appendChild(stopCell);
+
+      var durCell = document.createElement('td');
+      durCell.className = 'num';
+      durCell.textContent = fmtDuration(entry.stop - entry.start);
+      tr.appendChild(durCell);
+
+      var actionCell = document.createElement('td');
+      actionCell.className = 'action';
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del';
+      del.title = 'Delete this entry';
+      del.textContent = '\u00d7';
+      del.addEventListener('click', function () { removeEntry(entry.id); });
+      actionCell.appendChild(del);
+      tr.appendChild(actionCell);
+
+      rowsBody.appendChild(tr);
+    });
+
+    emptyMsg.style.display = entries.length === 0 ? 'block' : 'none';
+    updateRunningUI();
+  }
+
+  function updateRunningUI() {
+    if (running) {
+      toggleBtn.textContent = 'Stop';
+      toggleBtn.classList.add('stop');
+      taskInput.value = running.task;
+      taskInput.disabled = true;
+      var elapsed = fmtDuration(Date.now() - running.start);
+      statusEl.textContent = 'Running \u00b7 ' + elapsed;
+      document.title = '\u25cf ' + elapsed + ' \u2014 Time Tracker';
+    } else {
+      toggleBtn.textContent = 'Start';
+      toggleBtn.classList.remove('stop');
+      taskInput.disabled = false;
+      statusEl.textContent = entries.length + (entries.length === 1 ? ' entry' : ' entries');
+      document.title = 'Time Tracker';
+    }
+  }
+
+  function setStatus(message) {
+    statusEl.textContent = message;
+  }
+
+  function start() {
+    if (running) return;
+    running = {
+      task: clean(taskInput.value) || 'Untitled task',
+      start: Date.now()
+    };
+    write();
+    render();
+  }
+
+  function stop() {
+    if (!running) return;
+    entries.unshift({
+      id: uid(),
+      task: running.task,
+      start: running.start,
+      stop: Date.now()
+    });
+    running = null;
+    taskInput.value = '';
+    write();
+    render();
+    taskInput.focus();
+  }
+
+  function toggle() {
+    if (running) { stop(); } else { start(); }
+  }
+
+  function removeEntry(id) {
+    entries = entries.filter(function (entry) { return entry.id !== id; });
+    write();
+    render();
+  }
+
+  function asTsv() {
+    var lines = ['Task\tStart\tStop\tDuration'];
+    entries.forEach(function (entry) {
+      lines.push([
+        clean(entry.task),
+        fmtDateTime(entry.start),
+        fmtDateTime(entry.stop),
+        fmtDuration(entry.stop - entry.start)
+      ].join('\t'));
+    });
+    return lines.join('\n');
+  }
+
+  function legacyCopy(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+    ta.remove();
+    if (ok) { done(); } else { setStatus('Copy blocked \u2014 select the table and copy manually'); }
+  }
+
+  function copyForExcel() {
+    var text = asTsv();
+    var done = function () {
+      setStatus('Copied \u2014 paste into Excel');
+      setTimeout(updateRunningUI, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { legacyCopy(text, done); });
+    } else {
+      legacyCopy(text, done);
+    }
+  }
+
+  function clearAll() {
+    if (entries.length === 0 && !running) return;
+    var question = running
+      ? 'Delete all entries and stop the running timer?'
+      : 'Delete all entries?';
+    if (!window.confirm(question)) return;
+    entries = [];
+    running = null;
+    taskInput.value = '';
+    write();
+    render();
+  }
+
+  toggleBtn.addEventListener('click', toggle);
+  copyBtn.addEventListener('click', copyForExcel);
+  clearBtn.addEventListener('click', clearAll);
+  taskInput.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') { event.preventDefault(); toggle(); }
+  });
+
+  render();
+  setInterval(function () { if (running) { updateRunningUI(); } }, 1000);
+})();
+</script>
+</body>
+</html>
