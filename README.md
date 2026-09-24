@@ -47,4 +47,4 @@ Because the store is keyed to the `file://` origin and not the path, moving or r
 
 ## License
 
-No license yet.
+Apache-2.0 — see [LICENSE](LICENSE).
