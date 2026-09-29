@@ -16,12 +16,12 @@
   main { width: 100%; max-width: 900px; }
   h1 { font-size: 20px; margin: 0 0 16px; }
   .row { display: flex; gap: 8px; }
-  input[type="text"] {
+  input[type="text"], input[type="datetime-local"], input[type="number"] {
     flex: 1; min-width: 0; padding: 12px 14px; font-size: 16px;
     border: 1px solid #c8ccd2; border-radius: 8px; background: #fff; color: inherit;
   }
-  input[type="text"]:focus { outline: 2px solid #3b82f6; outline-offset: -1px; }
-  input[type="text"]:disabled { background: #eef0f3; color: #6b7280; }
+  input[type="text"]:focus, input[type="datetime-local"]:focus, input[type="number"]:focus { outline: 2px solid #3b82f6; outline-offset: -1px; }
+  input[type="text"]:disabled, input[type="datetime-local"]:disabled, input[type="number"]:disabled { background: #eef0f3; color: #6b7280; }
   button {
     font: inherit; cursor: pointer; border: 0; border-radius: 8px;
     padding: 12px 20px; font-weight: 600; font-size: 15px;
@@ -30,24 +30,39 @@
   #toggle.stop { background: #dc2626; }
   .toolbar { display: flex; gap: 8px; margin: 20px 0 8px; align-items: center; }
   .toolbar button { background: #e5e7eb; color: #1a1d21; padding: 8px 14px; font-size: 14px; }
+  .toolbar button:disabled { opacity: 0.5; cursor: default; }
   #status { font-size: 14px; color: #6b7280; margin-left: auto; white-space: nowrap; }
+  .row[hidden] { display: none; }
+  .manual { margin-bottom: 8px; }
+  .manual input[type="datetime-local"] { flex: 1.6; }
+  .manual button { background: #3b82f6; color: #fff; }
   table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
   th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eceef1; font-size: 14px; }
   th { background: #f0f1f4; font-weight: 600; }
   td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  td.action, th.action { width: 44px; text-align: right; }
+  td.action, th.action { width: 76px; text-align: right; }
   tr:last-child td { border-bottom: 0; }
-  .del { background: none; color: #9ca3af; padding: 4px 8px; font-size: 18px; line-height: 1; }
+  .del, .edit { background: none; color: #9ca3af; padding: 4px 8px; font-size: 18px; line-height: 1; }
   .del:hover { color: #dc2626; }
+  .edit:hover { color: #3b82f6; }
   .empty { padding: 24px; text-align: center; color: #9ca3af; font-size: 14px; }
+  .editrow td { background: #f7f9fb; }
+  .editfields { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .editfields input { min-width: 180px; }
+  .editfields input[type="datetime-local"] { flex: 1; }
+  .editdur { font-size: 14px; color: #6b7280; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .editfields button { background: #3b82f6; color: #fff; padding: 10px 16px; font-size: 14px; }
+  .editfields button.cancel { background: #e5e7eb; color: #1a1d21; }
   @media (prefers-color-scheme: dark) {
     body { background: #16181c; color: #e6e8eb; }
-    input[type="text"] { background: #1e2126; border-color: #34383f; }
-    input[type="text"]:disabled { background: #22252a; color: #8b9198; }
+    input[type="text"], input[type="datetime-local"], input[type="number"] { background: #1e2126; border-color: #34383f; }
+    input[type="text"]:disabled, input[type="datetime-local"]:disabled, input[type="number"]:disabled { background: #22252a; color: #8b9198; }
     table { background: #1e2126; }
     th { background: #24272d; }
     th, td { border-color: #2b2f35; }
     .toolbar button { background: #2b2f35; color: #e6e8eb; }
+    .editrow td { background: #191c21; }
+    .editfields button.cancel { background: #2b2f35; color: #e6e8eb; }
   }
 </style>
 </head>
@@ -63,7 +78,14 @@
   <div class="toolbar">
     <button id="copy" type="button">Copy for Excel</button>
     <button id="clear" type="button">Clear all</button>
+    <button id="addman" type="button" aria-controls="manual" aria-expanded="false">Add manually</button>
     <span id="status"></span>
+  </div>
+
+  <div class="row manual" id="manual" hidden>
+    <input id="when" type="datetime-local" aria-label="When this task happened">
+    <input id="minutes" type="number" min="1" step="1" inputmode="numeric" placeholder="Minutes" aria-label="How long it took, in minutes">
+    <button id="add" type="button">Add</button>
   </div>
 
   <table>
@@ -78,7 +100,7 @@
     </thead>
     <tbody id="rows"></tbody>
   </table>
-  <div id="empty" class="empty">No entries yet — type a task and press Start.</div>
+  <div id="empty" class="empty">No entries yet — type a task and press Start, or log a past one with Add manually.</div>
 </main>
 
 <script>
@@ -95,9 +117,18 @@
   var statusEl = document.getElementById('status');
   var copyBtn = document.getElementById('copy');
   var clearBtn = document.getElementById('clear');
+  var addManBtn = document.getElementById('addman');
+  var manualPanel = document.getElementById('manual');
+  var whenInput = document.getElementById('when');
+  var minutesInput = document.getElementById('minutes');
+  var addBtn = document.getElementById('add');
 
   var entries = read(ENTRIES_KEY, []);
   var running = read(RUNNING_KEY, null);
+  var MESSAGE_HOLD_MS = 2000;
+  var statusHoldUntil = 0;
+  var editingId = null;
+  var draft = null;
 
   function read(key, fallback) {
     try {
@@ -124,6 +155,14 @@
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
+  function fmtInput(ms) {
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+
+  function nowValue() { return fmtInput(Date.now()).slice(0, 16); }
+
   function fmtDateTime(ms) {
     var d = new Date(ms);
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
@@ -140,6 +179,10 @@
 
   function clean(text) {
     return String(text).replace(/[\t\r\n]+/g, ' ').trim();
+  }
+
+  function parseLocal(value) {
+    return value ? new Date(value).getTime() : NaN;
   }
 
   function render() {
@@ -169,6 +212,16 @@
 
       var actionCell = document.createElement('td');
       actionCell.className = 'action';
+
+      var edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'edit';
+      edit.title = 'Edit this entry';
+      edit.setAttribute('aria-label', 'Edit this entry');
+      edit.textContent = '\u270e';
+      edit.addEventListener('click', function () { openEditor(entry.id); });
+      actionCell.appendChild(edit);
+
       var del = document.createElement('button');
       del.type = 'button';
       del.className = 'del';
@@ -179,6 +232,8 @@
       tr.appendChild(actionCell);
 
       rowsBody.appendChild(tr);
+
+      if (editingId === entry.id) { rowsBody.appendChild(editRow(entry)); }
     });
 
     emptyMsg.style.display = entries.length === 0 ? 'block' : 'none';
@@ -191,6 +246,8 @@
       toggleBtn.classList.add('stop');
       taskInput.value = running.task;
       taskInput.disabled = true;
+      addManBtn.disabled = true;
+      if (!manualPanel.hidden) { setManualOpen(false); }
       var elapsed = fmtDuration(Date.now() - running.start);
       statusEl.textContent = 'Running \u00b7 ' + elapsed;
       document.title = '\u25cf ' + elapsed + ' \u2014 Time Tracker';
@@ -198,6 +255,7 @@
       toggleBtn.textContent = 'Start';
       toggleBtn.classList.remove('stop');
       taskInput.disabled = false;
+      addManBtn.disabled = false;
       statusEl.textContent = entries.length + (entries.length === 1 ? ' entry' : ' entries');
       document.title = 'Time Tracker';
     }
@@ -205,6 +263,7 @@
 
   function setStatus(message) {
     statusEl.textContent = message;
+    statusHoldUntil = Date.now() + MESSAGE_HOLD_MS;
   }
 
   function start() {
@@ -225,6 +284,7 @@
       start: running.start,
       stop: Date.now()
     });
+    sortEntries();
     running = null;
     taskInput.value = '';
     write();
@@ -238,8 +298,189 @@
 
   function removeEntry(id) {
     entries = entries.filter(function (entry) { return entry.id !== id; });
+    if (editingId === id) { editingId = null; draft = null; }
     write();
     render();
+  }
+
+  function findEntry(id) {
+    return entries.filter(function (entry) { return entry.id === id; })[0];
+  }
+
+  function openEditor(id) {
+    var entry = findEntry(id);
+    if (!entry) return;
+    editingId = id;
+    draft = {
+      task: entry.task,
+      start: fmtInput(entry.start),
+      stop: fmtInput(entry.stop)
+    };
+    render();
+    var box = document.querySelector('.editrow input');
+    if (box) box.focus();
+  }
+
+  function cancelEdit() {
+    editingId = null;
+    draft = null;
+    render();
+  }
+
+  function editRow(entry) {
+    var tr = document.createElement('tr');
+    tr.className = 'editrow';
+
+    var cell = document.createElement('td');
+    cell.colSpan = 5;
+
+    var fields = document.createElement('div');
+    fields.className = 'editfields';
+
+    var dur = document.createElement('span');
+    dur.className = 'editdur';
+
+    function refresh() {
+      var a = parseLocal(draft.start);
+      var b = parseLocal(draft.stop);
+      dur.textContent = (isNaN(a) || isNaN(b) || b <= a) ? '\u2014' : fmtDuration(b - a);
+    }
+
+    var taskBox = document.createElement('input');
+    taskBox.type = 'text';
+    taskBox.value = draft.task;
+    taskBox.setAttribute('aria-label', 'Task for this entry');
+    taskBox.addEventListener('input', function () { draft.task = taskBox.value; });
+
+    function timeBox(label, key) {
+      var box = document.createElement('input');
+      box.type = 'datetime-local';
+      box.step = '1';
+      box.value = draft[key];
+      box.setAttribute('aria-label', label);
+      box.addEventListener('input', function () {
+        draft[key] = box.value;
+        refresh();
+      });
+      return box;
+    }
+
+    var save = document.createElement('button');
+    save.type = 'button';
+    save.textContent = 'Save';
+    save.addEventListener('click', function () { saveEdit(entry.id); });
+
+    var cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'cancel';
+    cancel.textContent = 'Cancel';
+    cancel.addEventListener('click', cancelEdit);
+
+    fields.appendChild(taskBox);
+    fields.appendChild(timeBox('Start time', 'start'));
+    fields.appendChild(timeBox('Stop time', 'stop'));
+    fields.appendChild(dur);
+    fields.appendChild(save);
+    fields.appendChild(cancel);
+    cell.appendChild(fields);
+    tr.appendChild(cell);
+
+    tr.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        if (event.target.tagName === 'BUTTON') return;
+        event.preventDefault();
+        saveEdit(entry.id);
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelEdit();
+      }
+    });
+
+    refresh();
+    return tr;
+  }
+
+  function saveEdit(id) {
+    var entry = findEntry(id);
+    if (!entry || !draft) return;
+
+    var start = parseLocal(draft.start);
+    var stop = parseLocal(draft.stop);
+
+    if (isNaN(start)) { setStatus('Pick a valid start'); return; }
+    if (isNaN(stop)) { setStatus('Pick a valid stop'); return; }
+    if (stop <= start) { setStatus('Stop must be after Start'); return; }
+
+    entry.task = clean(draft.task) || 'Untitled task';
+    entry.start = start;
+    entry.stop = stop;
+
+    editingId = null;
+    draft = null;
+    sortEntries();
+    write();
+    render();
+    setStatus('Updated');
+  }
+
+  function sortEntries() {
+    entries.sort(function (a, b) { return b.start - a.start; });
+  }
+
+  function addManual() {
+    var start = parseLocal(whenInput.value);
+    var minutes = Number(minutesInput.value);
+
+    if (isNaN(start)) {
+      setStatus('Pick when it happened');
+      whenInput.focus();
+      return;
+    }
+    if (!isFinite(minutes) || minutes <= 0) {
+      setStatus('Enter how long, in minutes');
+      minutesInput.focus();
+      return;
+    }
+
+    var duration = Math.round(minutes * 60000);
+    var stop = start + duration;
+    if (isNaN(new Date(stop).getTime())) {
+      setStatus('That duration is out of range');
+      minutesInput.focus();
+      return;
+    }
+
+    entries.push({
+      id: uid(),
+      task: clean(taskInput.value) || 'Untitled task',
+      start: start,
+      stop: stop
+    });
+    sortEntries();
+
+    taskInput.value = '';
+    whenInput.value = nowValue();
+    minutesInput.value = '';
+
+    write();
+    render();
+    setStatus('Added \u2014 ' + fmtDuration(duration));
+    setTimeout(updateRunningUI, MESSAGE_HOLD_MS);
+    taskInput.focus();
+  }
+
+  function setManualOpen(open) {
+    manualPanel.hidden = !open;
+    addManBtn.textContent = open ? 'Close' : 'Add manually';
+    addManBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      whenInput.value = nowValue();
+      whenInput.focus();
+    }
+  }
+
+  function toggleManual() {
+    setManualOpen(manualPanel.hidden);
   }
 
   function asTsv() {
@@ -290,6 +531,8 @@
     if (!window.confirm(question)) return;
     entries = [];
     running = null;
+    editingId = null;
+    draft = null;
     taskInput.value = '';
     write();
     render();
@@ -298,12 +541,24 @@
   toggleBtn.addEventListener('click', toggle);
   copyBtn.addEventListener('click', copyForExcel);
   clearBtn.addEventListener('click', clearAll);
+  addManBtn.addEventListener('click', toggleManual);
+  addBtn.addEventListener('click', addManual);
+  whenInput.addEventListener('keydown', manualEnter);
+  minutesInput.addEventListener('keydown', manualEnter);
   taskInput.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') { event.preventDefault(); toggle(); }
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    if (manualPanel.hidden) { toggle(); } else { addManual(); }
   });
 
+  function manualEnter(event) {
+    if (event.key === 'Enter') { event.preventDefault(); addManual(); }
+  }
+
   render();
-  setInterval(function () { if (running) { updateRunningUI(); } }, 1000);
+  setInterval(function () {
+    if (running && Date.now() >= statusHoldUntil) { updateRunningUI(); }
+  }, 1000);
 })();
 </script>
 </body>

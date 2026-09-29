@@ -11,6 +11,10 @@ No install. No server. No account. One HTML file you double-click.
 3. Press **Stop** when the task is finished.
 4. Press **Copy for Excel**, then paste into a spreadsheet.
 
+Forgot to time something? Press **Add manually**, pick when it happened and type how many minutes it took, then **Add** — the entry joins the same table.
+
+Got something wrong? The **✎** on a row opens it for editing. Change the task, the start or the stop, then **Save** — the duration follows the times.
+
 ## What it records
 
 | Task | Start | Stop | Duration |
@@ -33,15 +37,16 @@ Because the store is keyed to the `file://` origin and not the path, moving or r
 
 ## Notes
 
-- **Enter** starts and stops the timer.
+- **Enter** starts and stops the timer — while the **Add manually** panel is open, it adds that entry instead.
+- **Add manually** takes the task from the box above it, so type the task first. The **When** field starts at the current date and time.
 - While a timer runs, the tab title shows a live `● HH:MM:SS`, so you can read it from the tab strip.
+- The **✎** on a row edits it in place — **Save** applies, **Escape** or **Cancel** discards, and **Enter** saves. One row is edited at a time.
 - The **×** on a row deletes that entry. **Clear all** empties the log.
 - The log is per-browser, so it does not follow you between machines.
 
 ## Roadmap
 
 - Export the log to a real `.csv` file (download)
-- Edit a finished entry
 - Track a date column so multi-day logs group cleanly in Excel
 - Named tasks / resume a recent task
 
