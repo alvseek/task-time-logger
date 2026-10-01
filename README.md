@@ -1,8 +1,8 @@
 # Task Time Logger
 
-A single-file task timer. Add the tasks you intend to work on, press **Start** on the one you're doing, **Stop** when you pause or finish, and **Done** to archive it — then copy the archived work straight into Excel.
+A lightweight task timer. Add the tasks you intend to work on, press **Start** on the one you're doing, **Stop** when you pause or finish, and **Done** to archive it — then copy the archived work straight into Excel.
 
-No install. No server. No account. One HTML file you double-click.
+No install. No server. No account. Open `index.html` and go.
 
 ## Use it
 
@@ -24,6 +24,22 @@ Every archived row is one work session:
 
 A task started and stopped three times produces three rows. The date filter is applied to the session — the day the work happened — and **Copy for Excel** copies exactly the rows on screen, newest first, as tab-separated text that pastes into Excel, Google Sheets and LibreOffice.
 
+## Project layout
+
+```
+index.html                 markup only — this is the file you open
+css/styles.css             all styling
+js/utils/format.js         Formatters — date, duration and text helpers
+js/models/Session.js       Session — one timed run (start, stop, duration)
+js/models/Task.js          Task — a named task holding zero or more sessions
+js/store/TaskStore.js      TaskStore — state, persistence, migration, running timer
+js/views/TaskListView.js   the open-task list and its actions
+js/views/ArchiveView.js    the archived table, date filter and Excel copy
+js/app.js                  App — creates the store and views, wires the events
+```
+
+The scripts are plain `<script src>` files loaded in the order above — **not** ES modules. That is deliberate: module loading is blocked over `file://`, so plain scripts keep the "double-click and go" property. Each class is written to convert directly into a module (and then TypeScript) when a build step is added.
+
 ## Where your data lives
 
 In the browser's `localStorage`, keyed to the page's origin. That means it survives:
@@ -42,12 +58,13 @@ Because the store is keyed to the `file://` origin and not the path, moving or r
 - The **✎** on an open task renames it. In the archive, the **✎** on a row edits that entry's task and times (the **Save** applies to the whole task name), and the **×** deletes that one entry. Deleting a task's last entry removes the task.
 - While a timer runs, the tab title shows a live `● HH:MM:SS`, so you can read it from the tab strip.
 - **Clear all** empties everything — open tasks, the archive, and any running timer.
-- Logs made with the earlier version of this file are imported automatically the first time this page loads, as archived tasks. Nothing is deleted.
+- Logs made with the earlier single-file version are imported automatically the first time this page loads, as archived tasks. Nothing is deleted.
 - The log is per-browser, so it does not follow you between machines.
 
 ## Roadmap
 
 - Export the log to a real `.csv` file (download)
+- Introduce a build step and convert the classes to TypeScript modules
 
 ## License
 

@@ -1,0 +1,69 @@
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f5f6f8; color: #1a1d21;
+    display: flex; justify-content: center;
+  }
+  main { width: 100%; max-width: 900px; }
+  h1 { font-size: 20px; margin: 0 0 16px; }
+  h2 { font-size: 15px; margin: 24px 0 8px; color: #4b5563; }
+  .row { display: flex; gap: 8px; }
+  input[type="text"], input[type="datetime-local"], input[type="number"], input[type="date"] {
+    flex: 1; min-width: 0; padding: 12px 14px; font-size: 16px;
+    border: 1px solid #c8ccd2; border-radius: 8px; background: #fff; color: inherit;
+  }
+  input[type="text"]:focus, input[type="datetime-local"]:focus, input[type="number"]:focus, input[type="date"]:focus { outline: 2px solid #3b82f6; outline-offset: -1px; }
+  button {
+    font: inherit; cursor: pointer; border: 0; border-radius: 8px;
+    padding: 12px 20px; font-weight: 600; font-size: 15px;
+  }
+  #addtask { background: #3b82f6; color: #fff; min-width: 110px; }
+  .toolbar { display: flex; gap: 8px; margin: 20px 0 8px; align-items: center; flex-wrap: wrap; }
+  .toolbar button { background: #e5e7eb; color: #1a1d21; padding: 8px 14px; font-size: 14px; }
+  .toolbar button:disabled { opacity: 0.5; cursor: default; }
+  #status { font-size: 14px; color: #6b7280; margin-left: auto; white-space: nowrap; }
+  .filterbar { margin: 8px 0; }
+  .filterbar label { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #6b7280; }
+  .filterbar input[type="date"] { flex: 0 0 auto; padding: 8px 10px; font-size: 14px; }
+  .row[hidden] { display: none; }
+  .manual { margin-bottom: 8px; }
+  .manual input[type="datetime-local"] { flex: 1.6; }
+  .manual button { background: #3b82f6; color: #fff; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; margin-bottom: 4px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eceef1; font-size: 14px; }
+  th { background: #f0f1f4; font-weight: 600; }
+  td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.action, th.action { width: 1%; text-align: right; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  .del, .edit, .restore { background: none; color: #9ca3af; padding: 4px 6px; font-size: 16px; line-height: 1; font-weight: 600; }
+  .del:hover { color: #dc2626; }
+  .edit:hover { color: #3b82f6; }
+  .restore:hover { color: #16a34a; }
+  .toggle { background: #16a34a; color: #fff; padding: 6px 12px; font-size: 13px; margin-right: 4px; }
+  .toggle.stop { background: #dc2626; }
+  .toggle:disabled { background: #cbd5e1; cursor: default; opacity: 0.7; }
+  .donebtn { background: #e5e7eb; color: #1a1d21; padding: 6px 12px; font-size: 13px; }
+  .donebtn:disabled { opacity: 0.5; cursor: default; }
+  .empty { padding: 18px; text-align: center; color: #9ca3af; font-size: 14px; }
+  .editrow td { background: #f7f9fb; }
+  .editfields { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .editfields input { min-width: 160px; }
+  .editfields input[type="datetime-local"] { flex: 1; }
+  .editdur { font-size: 14px; color: #6b7280; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .editfields button { background: #3b82f6; color: #fff; padding: 10px 16px; font-size: 14px; }
+  .editfields button.cancel { background: #e5e7eb; color: #1a1d21; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #16181c; color: #e6e8eb; }
+    h2 { color: #9ca3af; }
+    input[type="text"], input[type="datetime-local"], input[type="number"], input[type="date"] { background: #1e2126; border-color: #34383f; }
+    table { background: #1e2126; }
+    th { background: #24272d; }
+    th, td { border-color: #2b2f35; }
+    .toolbar button { background: #2b2f35; color: #e6e8eb; }
+    .donebtn { background: #2b2f35; color: #e6e8eb; }
+    .toggle:disabled { background: #34383f; }
+    .editrow td { background: #191c21; }
+    .editfields button.cancel { background: #2b2f35; color: #e6e8eb; }
+  }
