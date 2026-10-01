@@ -15,52 +15,62 @@
   }
   main { width: 100%; max-width: 900px; }
   h1 { font-size: 20px; margin: 0 0 16px; }
+  h2 { font-size: 15px; margin: 24px 0 8px; color: #4b5563; }
   .row { display: flex; gap: 8px; }
-  input[type="text"], input[type="datetime-local"], input[type="number"] {
+  input[type="text"], input[type="datetime-local"], input[type="number"], input[type="date"] {
     flex: 1; min-width: 0; padding: 12px 14px; font-size: 16px;
     border: 1px solid #c8ccd2; border-radius: 8px; background: #fff; color: inherit;
   }
-  input[type="text"]:focus, input[type="datetime-local"]:focus, input[type="number"]:focus { outline: 2px solid #3b82f6; outline-offset: -1px; }
-  input[type="text"]:disabled, input[type="datetime-local"]:disabled, input[type="number"]:disabled { background: #eef0f3; color: #6b7280; }
+  input[type="text"]:focus, input[type="datetime-local"]:focus, input[type="number"]:focus, input[type="date"]:focus { outline: 2px solid #3b82f6; outline-offset: -1px; }
   button {
     font: inherit; cursor: pointer; border: 0; border-radius: 8px;
     padding: 12px 20px; font-weight: 600; font-size: 15px;
   }
-  #toggle { min-width: 132px; background: #16a34a; color: #fff; }
-  #toggle.stop { background: #dc2626; }
-  .toolbar { display: flex; gap: 8px; margin: 20px 0 8px; align-items: center; }
+  #addtask { background: #3b82f6; color: #fff; min-width: 110px; }
+  .toolbar { display: flex; gap: 8px; margin: 20px 0 8px; align-items: center; flex-wrap: wrap; }
   .toolbar button { background: #e5e7eb; color: #1a1d21; padding: 8px 14px; font-size: 14px; }
   .toolbar button:disabled { opacity: 0.5; cursor: default; }
   #status { font-size: 14px; color: #6b7280; margin-left: auto; white-space: nowrap; }
+  .filterbar { margin: 8px 0; }
+  .filterbar label { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #6b7280; }
+  .filterbar input[type="date"] { flex: 0 0 auto; padding: 8px 10px; font-size: 14px; }
   .row[hidden] { display: none; }
   .manual { margin-bottom: 8px; }
   .manual input[type="datetime-local"] { flex: 1.6; }
   .manual button { background: #3b82f6; color: #fff; }
-  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; margin-bottom: 4px; }
   th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eceef1; font-size: 14px; }
   th { background: #f0f1f4; font-weight: 600; }
   td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  td.action, th.action { width: 76px; text-align: right; }
+  td.action, th.action { width: 1%; text-align: right; white-space: nowrap; }
   tr:last-child td { border-bottom: 0; }
-  .del, .edit { background: none; color: #9ca3af; padding: 4px 8px; font-size: 18px; line-height: 1; }
+  .del, .edit, .restore { background: none; color: #9ca3af; padding: 4px 6px; font-size: 16px; line-height: 1; font-weight: 600; }
   .del:hover { color: #dc2626; }
   .edit:hover { color: #3b82f6; }
-  .empty { padding: 24px; text-align: center; color: #9ca3af; font-size: 14px; }
+  .restore:hover { color: #16a34a; }
+  .toggle { background: #16a34a; color: #fff; padding: 6px 12px; font-size: 13px; margin-right: 4px; }
+  .toggle.stop { background: #dc2626; }
+  .toggle:disabled { background: #cbd5e1; cursor: default; opacity: 0.7; }
+  .donebtn { background: #e5e7eb; color: #1a1d21; padding: 6px 12px; font-size: 13px; }
+  .donebtn:disabled { opacity: 0.5; cursor: default; }
+  .empty { padding: 18px; text-align: center; color: #9ca3af; font-size: 14px; }
   .editrow td { background: #f7f9fb; }
   .editfields { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .editfields input { min-width: 180px; }
+  .editfields input { min-width: 160px; }
   .editfields input[type="datetime-local"] { flex: 1; }
   .editdur { font-size: 14px; color: #6b7280; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .editfields button { background: #3b82f6; color: #fff; padding: 10px 16px; font-size: 14px; }
   .editfields button.cancel { background: #e5e7eb; color: #1a1d21; }
   @media (prefers-color-scheme: dark) {
     body { background: #16181c; color: #e6e8eb; }
-    input[type="text"], input[type="datetime-local"], input[type="number"] { background: #1e2126; border-color: #34383f; }
-    input[type="text"]:disabled, input[type="datetime-local"]:disabled, input[type="number"]:disabled { background: #22252a; color: #8b9198; }
+    h2 { color: #9ca3af; }
+    input[type="text"], input[type="datetime-local"], input[type="number"], input[type="date"] { background: #1e2126; border-color: #34383f; }
     table { background: #1e2126; }
     th { background: #24272d; }
     th, td { border-color: #2b2f35; }
     .toolbar button { background: #2b2f35; color: #e6e8eb; }
+    .donebtn { background: #2b2f35; color: #e6e8eb; }
+    .toggle:disabled { background: #34383f; }
     .editrow td { background: #191c21; }
     .editfields button.cancel { background: #2b2f35; color: #e6e8eb; }
   }
@@ -71,14 +81,26 @@
   <h1>Time Tracker</h1>
 
   <div class="row">
-    <input id="task" type="text" placeholder="What are you working on?" autocomplete="off" aria-label="Task name">
-    <button id="toggle" type="button">Start</button>
+    <input id="task" type="text" placeholder="Add a task to your list…" autocomplete="off" aria-label="New task name">
+    <button id="addtask" type="button">Add task</button>
   </div>
 
+  <h2>Open tasks</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th class="num">Time</th>
+        <th class="action"></th>
+      </tr>
+    </thead>
+    <tbody id="taskrows"></tbody>
+  </table>
+  <div id="tasksempty" class="empty">No open tasks — add one above.</div>
+
   <div class="toolbar">
-    <button id="copy" type="button">Copy for Excel</button>
-    <button id="clear" type="button">Clear all</button>
     <button id="addman" type="button" aria-controls="manual" aria-expanded="false">Add manually</button>
+    <button id="clear" type="button">Clear all</button>
     <span id="status"></span>
   </div>
 
@@ -88,47 +110,66 @@
     <button id="add" type="button">Add</button>
   </div>
 
+  <h2>Archived</h2>
+  <div class="toolbar filterbar">
+    <label>From <input id="from" type="date" aria-label="Show archived work from this date"></label>
+    <label>To <input id="to" type="date" aria-label="Show archived work up to this date"></label>
+    <button id="copy" type="button">Copy for Excel</button>
+    <span id="archcount"></span>
+  </div>
+
   <table>
     <thead>
       <tr>
         <th>Task</th>
+        <th class="num">Date</th>
         <th class="num">Start</th>
         <th class="num">Stop</th>
         <th class="num">Duration</th>
         <th class="action"></th>
       </tr>
     </thead>
-    <tbody id="rows"></tbody>
+    <tbody id="archrows"></tbody>
   </table>
-  <div id="empty" class="empty">No entries yet — type a task and press Start, or log a past one with Add manually.</div>
+  <div id="archempty" class="empty">Nothing archived yet — finish a task with Done, or log a past one with Add manually.</div>
 </main>
 
 <script>
 (function () {
   'use strict';
 
-  var ENTRIES_KEY = 'time-tracker.entries.v1';
-  var RUNNING_KEY = 'time-tracker.running.v1';
+  var TASKS_KEY = 'time-tracker.tasks.v2';
+  var RUNNING_KEY = 'time-tracker.running.v2';
+  var LEGACY_ENTRIES_KEY = 'time-tracker.entries.v1';
 
   var taskInput = document.getElementById('task');
-  var toggleBtn = document.getElementById('toggle');
-  var rowsBody = document.getElementById('rows');
-  var emptyMsg = document.getElementById('empty');
+  var addTaskBtn = document.getElementById('addtask');
+  var taskRowsBody = document.getElementById('taskrows');
+  var tasksEmpty = document.getElementById('tasksempty');
   var statusEl = document.getElementById('status');
-  var copyBtn = document.getElementById('copy');
   var clearBtn = document.getElementById('clear');
   var addManBtn = document.getElementById('addman');
   var manualPanel = document.getElementById('manual');
   var whenInput = document.getElementById('when');
   var minutesInput = document.getElementById('minutes');
   var addBtn = document.getElementById('add');
+  var fromInput = document.getElementById('from');
+  var toInput = document.getElementById('to');
+  var copyBtn = document.getElementById('copy');
+  var archRowsBody = document.getElementById('archrows');
+  var archEmpty = document.getElementById('archempty');
+  var archCount = document.getElementById('archcount');
 
-  var entries = read(ENTRIES_KEY, []);
+  var tasks = loadTasks();
   var running = read(RUNNING_KEY, null);
+  if (running && (!running.taskId || !isOpen(running.taskId))) running = null;
+
   var MESSAGE_HOLD_MS = 2000;
   var statusHoldUntil = 0;
-  var editingId = null;
-  var draft = null;
+  var renamingId = null;
+  var renameDraft = '';
+  var sessionEdit = null; // { taskId, sessionId, draft: { name, start, stop } }
+  var runningTimeCell = null;
 
   function read(key, fallback) {
     try {
@@ -141,11 +182,46 @@
 
   function write() {
     try {
-      localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries));
+      localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
       localStorage.setItem(RUNNING_KEY, JSON.stringify(running));
     } catch (err) {
       setStatus('Could not save (storage blocked)');
     }
+  }
+
+  function loadTasks() {
+    var raw = null;
+    try { raw = localStorage.getItem(TASKS_KEY); } catch (err) { raw = null; }
+    if (raw !== null) {
+      // The key exists, so migration already happened (or the store is corrupt).
+      // Never re-migrate here — that would resurrect the legacy log as duplicates.
+      try {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (err) {}
+      return [];
+    }
+
+    var migrated = [];
+    var legacy = read(LEGACY_ENTRIES_KEY, null);
+    if (Array.isArray(legacy)) {
+      legacy.forEach(function (entry) {
+        if (!entry || typeof entry !== 'object') return;
+        var start = Number(entry.start);
+        var stop = Number(entry.stop);
+        if (!isFinite(start) || !isFinite(stop) || stop <= start) return;
+        migrated.push({
+          id: uid(),
+          name: clean(entry.task) || 'Untitled task',
+          status: 'done',
+          createdAt: start,
+          doneAt: stop,
+          sessions: [{ id: uid(), start: start, stop: stop }]
+        });
+      });
+    }
+    try { localStorage.setItem(TASKS_KEY, JSON.stringify(migrated)); } catch (err) {}
+    return migrated;
   }
 
   function uid() {
@@ -169,6 +245,11 @@
       ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
   }
 
+  function dateStr(ms) {
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
   function fmtDuration(ms) {
     var total = Math.max(0, Math.floor(ms / 1000));
     var h = Math.floor(total / 3600);
@@ -185,33 +266,183 @@
     return value ? new Date(value).getTime() : NaN;
   }
 
-  function render() {
-    rowsBody.textContent = '';
+  function findTask(id) {
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === id) return tasks[i];
+    }
+    return null;
+  }
 
-    entries.forEach(function (entry) {
+  function isOpen(id) {
+    var task = findTask(id);
+    return !!task && task.status !== 'done';
+  }
+
+  function openTasks() {
+    return tasks.filter(function (task) { return task.status !== 'done'; });
+  }
+
+  function doneTasks() {
+    return tasks.filter(function (task) { return task.status === 'done'; });
+  }
+
+  function taskTotal(task, nowMs) {
+    var total = 0;
+    task.sessions.forEach(function (s) { total += (s.stop - s.start); });
+    if (running && running.taskId === task.id) total += (nowMs - running.start);
+    return total;
+  }
+
+  function passesFilter(ms) {
+    var d = dateStr(ms);
+    if (fromInput.value && d < fromInput.value) return false;
+    if (toInput.value && d > toInput.value) return false;
+    return true;
+  }
+
+  function archivedRows() {
+    var rows = [];
+    doneTasks().forEach(function (task) {
+      task.sessions.forEach(function (session) {
+        if (passesFilter(session.start)) rows.push({ task: task, session: session });
+      });
+    });
+    rows.sort(function (a, b) { return b.session.start - a.session.start; });
+    return rows;
+  }
+
+  function render() {
+    renderTasks();
+    renderArchived();
+    updateRunningUI();
+  }
+
+  function renderTasks() {
+    taskRowsBody.textContent = '';
+    runningTimeCell = null;
+
+    var list = openTasks().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    var now = Date.now();
+
+    list.forEach(function (task) {
+      var isRunning = !!running && running.taskId === task.id;
+      var tr = document.createElement('tr');
+
+      var nameCell = document.createElement('td');
+      nameCell.textContent = task.name;
+      tr.appendChild(nameCell);
+
+      var timeCell = document.createElement('td');
+      timeCell.className = 'num';
+      timeCell.textContent = fmtDuration(taskTotal(task, now));
+      if (isRunning) runningTimeCell = timeCell;
+      tr.appendChild(timeCell);
+
+      var actionCell = document.createElement('td');
+      actionCell.className = 'action';
+
+      var toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'toggle';
+      if (isRunning) {
+        toggle.textContent = 'Stop';
+        toggle.classList.add('stop');
+        toggle.title = 'Stop timing this task';
+      } else {
+        toggle.textContent = 'Start';
+        toggle.disabled = !!running;
+        toggle.title = running ? 'Stop the running task first' : 'Start timing this task';
+      }
+      toggle.addEventListener('click', function () {
+        if (running && running.taskId === task.id) { stopTimer(); } else { startTimer(task.id); }
+      });
+      actionCell.appendChild(toggle);
+
+      var done = document.createElement('button');
+      done.type = 'button';
+      done.className = 'donebtn';
+      done.textContent = 'Done';
+      if (task.sessions.length === 0 && !isRunning) {
+        done.disabled = true;
+        done.title = 'Start the task first — there is no time to archive';
+      } else {
+        done.title = 'Mark done and archive';
+      }
+      done.addEventListener('click', function () { markDone(task.id); });
+      actionCell.appendChild(done);
+
+      var edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'edit';
+      edit.title = 'Rename this task';
+      edit.setAttribute('aria-label', 'Rename this task');
+      edit.textContent = '\u270e';
+      edit.addEventListener('click', function () { openRename(task.id); });
+      actionCell.appendChild(edit);
+
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del';
+      del.title = 'Delete this task';
+      del.setAttribute('aria-label', 'Delete this task');
+      del.textContent = '\u00d7';
+      del.addEventListener('click', function () { deleteTask(task.id); });
+      actionCell.appendChild(del);
+
+      tr.appendChild(actionCell);
+      taskRowsBody.appendChild(tr);
+
+      if (renamingId === task.id) taskRowsBody.appendChild(renameRow(task));
+    });
+
+    tasksEmpty.style.display = list.length === 0 ? 'block' : 'none';
+  }
+
+  function renderArchived() {
+    archRowsBody.textContent = '';
+
+    var rows = archivedRows();
+    rows.forEach(function (pair) {
+      var task = pair.task;
+      var session = pair.session;
+
       var tr = document.createElement('tr');
 
       var taskCell = document.createElement('td');
-      taskCell.textContent = entry.task;
+      taskCell.textContent = task.name;
       tr.appendChild(taskCell);
+
+      var dateCell = document.createElement('td');
+      dateCell.className = 'num';
+      dateCell.textContent = dateStr(session.start);
+      tr.appendChild(dateCell);
 
       var startCell = document.createElement('td');
       startCell.className = 'num';
-      startCell.textContent = fmtDateTime(entry.start);
+      startCell.textContent = fmtDateTime(session.start);
       tr.appendChild(startCell);
 
       var stopCell = document.createElement('td');
       stopCell.className = 'num';
-      stopCell.textContent = fmtDateTime(entry.stop);
+      stopCell.textContent = fmtDateTime(session.stop);
       tr.appendChild(stopCell);
 
       var durCell = document.createElement('td');
       durCell.className = 'num';
-      durCell.textContent = fmtDuration(entry.stop - entry.start);
+      durCell.textContent = fmtDuration(session.stop - session.start);
       tr.appendChild(durCell);
 
       var actionCell = document.createElement('td');
       actionCell.className = 'action';
+
+      var restore = document.createElement('button');
+      restore.type = 'button';
+      restore.className = 'restore';
+      restore.title = 'Restore this task to the open list';
+      restore.setAttribute('aria-label', 'Restore this task');
+      restore.textContent = '\u21a9';
+      restore.addEventListener('click', function () { restoreTask(task.id); });
+      actionCell.appendChild(restore);
 
       var edit = document.createElement('button');
       edit.type = 'button';
@@ -219,120 +450,83 @@
       edit.title = 'Edit this entry';
       edit.setAttribute('aria-label', 'Edit this entry');
       edit.textContent = '\u270e';
-      edit.addEventListener('click', function () { openEditor(entry.id); });
+      edit.addEventListener('click', function () { openSessionEdit(task.id, session.id); });
       actionCell.appendChild(edit);
 
       var del = document.createElement('button');
       del.type = 'button';
       del.className = 'del';
       del.title = 'Delete this entry';
+      del.setAttribute('aria-label', 'Delete this entry');
       del.textContent = '\u00d7';
-      del.addEventListener('click', function () { removeEntry(entry.id); });
+      del.addEventListener('click', function () { deleteSession(task.id, session.id); });
       actionCell.appendChild(del);
+
       tr.appendChild(actionCell);
+      archRowsBody.appendChild(tr);
 
-      rowsBody.appendChild(tr);
-
-      if (editingId === entry.id) { rowsBody.appendChild(editRow(entry)); }
+      if (sessionEdit && sessionEdit.sessionId === session.id) {
+        archRowsBody.appendChild(sessionEditRow(task, session));
+      }
     });
 
-    emptyMsg.style.display = entries.length === 0 ? 'block' : 'none';
-    updateRunningUI();
+    archEmpty.style.display = rows.length === 0 ? 'block' : 'none';
+    archCount.textContent = rows.length + (rows.length === 1 ? ' row' : ' rows');
   }
 
-  function updateRunningUI() {
-    if (running) {
-      toggleBtn.textContent = 'Stop';
-      toggleBtn.classList.add('stop');
-      taskInput.value = running.task;
-      taskInput.disabled = true;
-      addManBtn.disabled = true;
-      if (!manualPanel.hidden) { setManualOpen(false); }
-      var elapsed = fmtDuration(Date.now() - running.start);
-      statusEl.textContent = 'Running \u00b7 ' + elapsed;
-      document.title = '\u25cf ' + elapsed + ' \u2014 Time Tracker';
-    } else {
-      toggleBtn.textContent = 'Start';
-      toggleBtn.classList.remove('stop');
-      taskInput.disabled = false;
-      addManBtn.disabled = false;
-      statusEl.textContent = entries.length + (entries.length === 1 ? ' entry' : ' entries');
-      document.title = 'Time Tracker';
-    }
-  }
-
-  function setStatus(message) {
-    statusEl.textContent = message;
-    statusHoldUntil = Date.now() + MESSAGE_HOLD_MS;
-  }
-
-  function start() {
-    if (running) return;
-    running = {
-      task: clean(taskInput.value) || 'Untitled task',
-      start: Date.now()
-    };
-    write();
-    render();
-  }
-
-  function stop() {
-    if (!running) return;
-    entries.unshift({
-      id: uid(),
-      task: running.task,
-      start: running.start,
-      stop: Date.now()
-    });
-    sortEntries();
-    running = null;
-    taskInput.value = '';
-    write();
-    render();
-    taskInput.focus();
-  }
-
-  function toggle() {
-    if (running) { stop(); } else { start(); }
-  }
-
-  function removeEntry(id) {
-    entries = entries.filter(function (entry) { return entry.id !== id; });
-    if (editingId === id) { editingId = null; draft = null; }
-    write();
-    render();
-  }
-
-  function findEntry(id) {
-    return entries.filter(function (entry) { return entry.id === id; })[0];
-  }
-
-  function openEditor(id) {
-    var entry = findEntry(id);
-    if (!entry) return;
-    editingId = id;
-    draft = {
-      task: entry.task,
-      start: fmtInput(entry.start),
-      stop: fmtInput(entry.stop)
-    };
-    render();
-    var box = document.querySelector('.editrow input');
-    if (box) box.focus();
-  }
-
-  function cancelEdit() {
-    editingId = null;
-    draft = null;
-    render();
-  }
-
-  function editRow(entry) {
+  function renameRow(task) {
     var tr = document.createElement('tr');
-    tr.className = 'editrow';
+    tr.className = 'editrow renamerow';
 
     var cell = document.createElement('td');
-    cell.colSpan = 5;
+    cell.colSpan = 3;
+
+    var fields = document.createElement('div');
+    fields.className = 'editfields';
+
+    var box = document.createElement('input');
+    box.type = 'text';
+    box.value = renameDraft;
+    box.setAttribute('aria-label', 'Task name');
+    box.addEventListener('input', function () { renameDraft = box.value; });
+
+    var save = document.createElement('button');
+    save.type = 'button';
+    save.textContent = 'Save';
+    save.addEventListener('click', function () { saveRename(task.id); });
+
+    var cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.className = 'cancel';
+    cancel.textContent = 'Cancel';
+    cancel.addEventListener('click', cancelRename);
+
+    fields.appendChild(box);
+    fields.appendChild(save);
+    fields.appendChild(cancel);
+    cell.appendChild(fields);
+    tr.appendChild(cell);
+
+    tr.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        if (event.target.tagName === 'BUTTON') return;
+        event.preventDefault();
+        saveRename(task.id);
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelRename();
+      }
+    });
+
+    return tr;
+  }
+
+  function sessionEditRow(task, session) {
+    var tr = document.createElement('tr');
+    tr.className = 'editrow sessrow';
+
+    var cell = document.createElement('td');
+    cell.colSpan = 6;
 
     var fields = document.createElement('div');
     fields.className = 'editfields';
@@ -341,25 +535,25 @@
     dur.className = 'editdur';
 
     function refresh() {
-      var a = parseLocal(draft.start);
-      var b = parseLocal(draft.stop);
+      var a = parseLocal(sessionEdit.draft.start);
+      var b = parseLocal(sessionEdit.draft.stop);
       dur.textContent = (isNaN(a) || isNaN(b) || b <= a) ? '\u2014' : fmtDuration(b - a);
     }
 
-    var taskBox = document.createElement('input');
-    taskBox.type = 'text';
-    taskBox.value = draft.task;
-    taskBox.setAttribute('aria-label', 'Task for this entry');
-    taskBox.addEventListener('input', function () { draft.task = taskBox.value; });
+    var nameBox = document.createElement('input');
+    nameBox.type = 'text';
+    nameBox.value = sessionEdit.draft.name;
+    nameBox.setAttribute('aria-label', 'Task name');
+    nameBox.addEventListener('input', function () { sessionEdit.draft.name = nameBox.value; });
 
     function timeBox(label, key) {
       var box = document.createElement('input');
       box.type = 'datetime-local';
       box.step = '1';
-      box.value = draft[key];
+      box.value = sessionEdit.draft[key];
       box.setAttribute('aria-label', label);
       box.addEventListener('input', function () {
-        draft[key] = box.value;
+        sessionEdit.draft[key] = box.value;
         refresh();
       });
       return box;
@@ -368,15 +562,15 @@
     var save = document.createElement('button');
     save.type = 'button';
     save.textContent = 'Save';
-    save.addEventListener('click', function () { saveEdit(entry.id); });
+    save.addEventListener('click', function () { saveSessionEdit(); });
 
     var cancel = document.createElement('button');
     cancel.type = 'button';
     cancel.className = 'cancel';
     cancel.textContent = 'Cancel';
-    cancel.addEventListener('click', cancelEdit);
+    cancel.addEventListener('click', cancelSessionEdit);
 
-    fields.appendChild(taskBox);
+    fields.appendChild(nameBox);
     fields.appendChild(timeBox('Start time', 'start'));
     fields.appendChild(timeBox('Stop time', 'stop'));
     fields.appendChild(dur);
@@ -389,10 +583,10 @@
       if (event.key === 'Enter') {
         if (event.target.tagName === 'BUTTON') return;
         event.preventDefault();
-        saveEdit(entry.id);
+        saveSessionEdit();
       } else if (event.key === 'Escape') {
         event.preventDefault();
-        cancelEdit();
+        cancelSessionEdit();
       }
     });
 
@@ -400,31 +594,182 @@
     return tr;
   }
 
-  function saveEdit(id) {
-    var entry = findEntry(id);
-    if (!entry || !draft) return;
+  function updateRunningUI() {
+    if (running) {
+      var elapsed = fmtDuration(Date.now() - running.start);
+      var task = findTask(running.taskId);
+      if (task && runningTimeCell) runningTimeCell.textContent = fmtDuration(taskTotal(task, Date.now()));
+      if (Date.now() >= statusHoldUntil) statusEl.textContent = 'Running \u00b7 ' + elapsed;
+      document.title = '\u25cf ' + elapsed + ' \u2014 Time Tracker';
+    } else {
+      document.title = 'Time Tracker';
+      if (Date.now() >= statusHoldUntil) {
+        var open = openTasks().length;
+        var archived = doneTasks().length;
+        statusEl.textContent = open + ' open \u00b7 ' + archived + ' archived';
+      }
+    }
+  }
 
-    var start = parseLocal(draft.start);
-    var stop = parseLocal(draft.stop);
+  function setStatus(message) {
+    statusEl.textContent = message;
+    statusHoldUntil = Date.now() + MESSAGE_HOLD_MS;
+  }
+
+  function addTask() {
+    var name = clean(taskInput.value);
+    if (!name) { setStatus('Type a task name'); taskInput.focus(); return; }
+    tasks.push({
+      id: uid(),
+      name: name,
+      status: 'open',
+      createdAt: Date.now(),
+      doneAt: null,
+      sessions: []
+    });
+    taskInput.value = '';
+    write();
+    render();
+    setStatus('Added');
+    taskInput.focus();
+  }
+
+  function startTimer(taskId) {
+    if (running) return;
+    var task = findTask(taskId);
+    if (!task || task.status === 'done') return;
+    running = { taskId: taskId, start: Date.now() };
+    write();
+    render();
+  }
+
+  function stopTimer() {
+    if (!running) return;
+    var task = findTask(running.taskId);
+    if (task) task.sessions.push({ id: uid(), start: running.start, stop: Date.now() });
+    running = null;
+    write();
+    render();
+  }
+
+  function markDone(taskId) {
+    if (running && running.taskId === taskId) stopTimer();
+    var task = findTask(taskId);
+    if (!task) return;
+    if (task.sessions.length === 0) { setStatus('Start the task first'); return; }
+    task.status = 'done';
+    task.doneAt = Date.now();
+    if (renamingId === taskId) { renamingId = null; renameDraft = ''; }
+    write();
+    render();
+    setStatus('Archived');
+  }
+
+  function restoreTask(taskId) {
+    var task = findTask(taskId);
+    if (!task) return;
+    if (sessionEdit && sessionEdit.taskId === taskId) sessionEdit = null;
+    task.status = 'open';
+    task.doneAt = null;
+    write();
+    render();
+    setStatus('Restored');
+  }
+
+  function deleteTask(taskId) {
+    var task = findTask(taskId);
+    if (!task) return;
+    if (task.sessions.length && !window.confirm('Delete "' + task.name + '" and its ' + task.sessions.length + ' entr' + (task.sessions.length === 1 ? 'y' : 'ies') + '?')) return;
+    if (running && running.taskId === taskId) running = null;
+    tasks = tasks.filter(function (t) { return t.id !== taskId; });
+    if (renamingId === taskId) { renamingId = null; renameDraft = ''; }
+    write();
+    render();
+  }
+
+  function deleteSession(taskId, sessionId) {
+    var task = findTask(taskId);
+    if (!task) return;
+    task.sessions = task.sessions.filter(function (s) { return s.id !== sessionId; });
+    if (sessionEdit && sessionEdit.sessionId === sessionId) sessionEdit = null;
+    if (task.sessions.length === 0) {
+      tasks = tasks.filter(function (t) { return t.id !== taskId; });
+    }
+    write();
+    render();
+  }
+
+  function openRename(taskId) {
+    var task = findTask(taskId);
+    if (!task) return;
+    renamingId = taskId;
+    renameDraft = task.name;
+    render();
+    var box = document.querySelector('.renamerow input');
+    if (box) { box.focus(); box.select(); }
+  }
+
+  function cancelRename() {
+    renamingId = null;
+    renameDraft = '';
+    render();
+  }
+
+  function saveRename(taskId) {
+    var task = findTask(taskId);
+    if (!task) return;
+    task.name = clean(renameDraft) || 'Untitled task';
+    renamingId = null;
+    renameDraft = '';
+    write();
+    render();
+    setStatus('Renamed');
+  }
+
+  function openSessionEdit(taskId, sessionId) {
+    var task = findTask(taskId);
+    if (!task) return;
+    var session = null;
+    task.sessions.forEach(function (s) { if (s.id === sessionId) session = s; });
+    if (!session) return;
+    sessionEdit = {
+      taskId: taskId,
+      sessionId: sessionId,
+      draft: { name: task.name, start: fmtInput(session.start), stop: fmtInput(session.stop) }
+    };
+    render();
+    var box = document.querySelector('.sessrow input');
+    if (box) box.focus();
+  }
+
+  function cancelSessionEdit() {
+    sessionEdit = null;
+    render();
+  }
+
+  function saveSessionEdit() {
+    if (!sessionEdit) return;
+    var task = findTask(sessionEdit.taskId);
+    if (!task) { sessionEdit = null; render(); return; }
+    var session = null;
+    task.sessions.forEach(function (s) { if (s.id === sessionEdit.sessionId) session = s; });
+    if (!session) { sessionEdit = null; render(); return; }
+
+    var start = parseLocal(sessionEdit.draft.start);
+    var stop = parseLocal(sessionEdit.draft.stop);
 
     if (isNaN(start)) { setStatus('Pick a valid start'); return; }
     if (isNaN(stop)) { setStatus('Pick a valid stop'); return; }
     if (stop <= start) { setStatus('Stop must be after Start'); return; }
 
-    entry.task = clean(draft.task) || 'Untitled task';
-    entry.start = start;
-    entry.stop = stop;
+    task.name = clean(sessionEdit.draft.name) || 'Untitled task';
+    session.start = start;
+    session.stop = stop;
 
-    editingId = null;
-    draft = null;
-    sortEntries();
+    sessionEdit = null;
     write();
     render();
     setStatus('Updated');
-  }
-
-  function sortEntries() {
-    entries.sort(function (a, b) { return b.start - a.start; });
   }
 
   function addManual() {
@@ -450,13 +795,14 @@
       return;
     }
 
-    entries.push({
+    tasks.push({
       id: uid(),
-      task: clean(taskInput.value) || 'Untitled task',
-      start: start,
-      stop: stop
+      name: clean(taskInput.value) || 'Untitled task',
+      status: 'done',
+      createdAt: start,
+      doneAt: stop,
+      sessions: [{ id: uid(), start: start, stop: stop }]
     });
-    sortEntries();
 
     taskInput.value = '';
     whenInput.value = nowValue();
@@ -465,7 +811,6 @@
     write();
     render();
     setStatus('Added \u2014 ' + fmtDuration(duration));
-    setTimeout(updateRunningUI, MESSAGE_HOLD_MS);
     taskInput.focus();
   }
 
@@ -484,13 +829,14 @@
   }
 
   function asTsv() {
-    var lines = ['Task\tStart\tStop\tDuration'];
-    entries.forEach(function (entry) {
+    var lines = ['Task\tDate\tStart\tStop\tDuration'];
+    archivedRows().forEach(function (pair) {
       lines.push([
-        clean(entry.task),
-        fmtDateTime(entry.start),
-        fmtDateTime(entry.stop),
-        fmtDuration(entry.stop - entry.start)
+        clean(pair.task.name),
+        dateStr(pair.session.start),
+        fmtDateTime(pair.session.start),
+        fmtDateTime(pair.session.stop),
+        fmtDuration(pair.session.stop - pair.session.start)
       ].join('\t'));
     });
     return lines.join('\n');
@@ -511,10 +857,10 @@
   }
 
   function copyForExcel() {
+    if (archivedRows().length === 0) { setStatus('Nothing archived to copy'); return; }
     var text = asTsv();
     var done = function () {
       setStatus('Copied \u2014 paste into Excel');
-      setTimeout(updateRunningUI, 1500);
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(done, function () { legacyCopy(text, done); });
@@ -524,31 +870,31 @@
   }
 
   function clearAll() {
-    if (entries.length === 0 && !running) return;
-    var question = running
-      ? 'Delete all entries and stop the running timer?'
-      : 'Delete all entries?';
-    if (!window.confirm(question)) return;
-    entries = [];
+    if (tasks.length === 0 && !running) return;
+    if (!window.confirm(running ? 'Delete all tasks and stop the running timer?' : 'Delete all tasks and their entries?')) return;
+    tasks = [];
     running = null;
-    editingId = null;
-    draft = null;
+    renamingId = null;
+    renameDraft = '';
+    sessionEdit = null;
     taskInput.value = '';
     write();
     render();
   }
 
-  toggleBtn.addEventListener('click', toggle);
+  addTaskBtn.addEventListener('click', addTask);
   copyBtn.addEventListener('click', copyForExcel);
   clearBtn.addEventListener('click', clearAll);
   addManBtn.addEventListener('click', toggleManual);
   addBtn.addEventListener('click', addManual);
+  fromInput.addEventListener('input', function () { renderArchived(); updateRunningUI(); });
+  toInput.addEventListener('input', function () { renderArchived(); updateRunningUI(); });
   whenInput.addEventListener('keydown', manualEnter);
   minutesInput.addEventListener('keydown', manualEnter);
   taskInput.addEventListener('keydown', function (event) {
     if (event.key !== 'Enter') return;
     event.preventDefault();
-    if (manualPanel.hidden) { toggle(); } else { addManual(); }
+    addTask();
   });
 
   function manualEnter(event) {
@@ -556,9 +902,7 @@
   }
 
   render();
-  setInterval(function () {
-    if (running && Date.now() >= statusHoldUntil) { updateRunningUI(); }
-  }, 1000);
+  setInterval(updateRunningUI, 1000);
 })();
 </script>
 </body>

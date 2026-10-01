@@ -1,27 +1,28 @@
 # Task Time Logger
 
-A single-file time tracker. Type what you're working on, press **Start**, press **Stop** when you're done — the entry lands in a table you can paste straight into Excel.
+A single-file task timer. Add the tasks you intend to work on, press **Start** on the one you're doing, **Stop** when you pause or finish, and **Done** to archive it — then copy the archived work straight into Excel.
 
 No install. No server. No account. One HTML file you double-click.
 
 ## Use it
 
 1. Open `index.html` (double-click it, or bookmark it in your browser).
-2. Type the task, press **Start** — or just hit **Enter**.
-3. Press **Stop** when the task is finished.
-4. Press **Copy for Excel**, then paste into a spreadsheet.
+2. Type a task and press **Add task** — repeat for everything on your list.
+3. Press **Start** on the task you're working on, and **Stop** when you pause. A task can be started and stopped as many times as you like — its time adds up.
+4. Press **Done** when the task is finished. It moves to **Archived**. Changed your mind? The **↩** on an archived row restores it to the open list.
+5. In **Archived**, narrow the list with the **From** and **To** date boxes, then press **Copy for Excel** and paste.
 
-Forgot to time something? Press **Add manually**, pick when it happened and type how many minutes it took, then **Add** — the entry joins the same table.
-
-Got something wrong? The **✎** on a row opens it for editing. Change the task, the start or the stop, then **Save** — the duration follows the times.
+Forgot to time something? Press **Add manually**, pick when it happened and how many minutes it took, type the task name, then **Add** — it lands in the archive, already done.
 
 ## What it records
 
-| Task | Start | Stop | Duration |
-| --- | --- | --- | --- |
-| Write the report | 2026-09-24 15:26:11 | 2026-09-24 15:41:02 | 00:14:51 |
+Every archived row is one work session:
 
-Newest entry sits on top. **Copy for Excel** copies the whole table as tab-separated text, which pastes into columns in Excel, Google Sheets and LibreOffice.
+| Task | Date | Start | Stop | Duration |
+| --- | --- | --- | --- | --- |
+| Write the report | 2026-09-24 | 2026-09-24 15:26:11 | 2026-09-24 15:41:02 | 00:14:51 |
+
+A task started and stopped three times produces three rows. The date filter is applied to the session — the day the work happened — and **Copy for Excel** copies exactly the rows on screen, newest first, as tab-separated text that pastes into Excel, Google Sheets and LibreOffice.
 
 ## Where your data lives
 
@@ -37,18 +38,16 @@ Because the store is keyed to the `file://` origin and not the path, moving or r
 
 ## Notes
 
-- **Enter** starts and stops the timer — while the **Add manually** panel is open, it adds that entry instead.
-- **Add manually** takes the task from the box above it, so type the task first. The **When** field starts at the current date and time.
+- One task runs at a time. While a timer runs, the other **Start** buttons are disabled — press **Stop** first.
+- The **✎** on an open task renames it. In the archive, the **✎** on a row edits that entry's task and times (the **Save** applies to the whole task name), and the **×** deletes that one entry. Deleting a task's last entry removes the task.
 - While a timer runs, the tab title shows a live `● HH:MM:SS`, so you can read it from the tab strip.
-- The **✎** on a row edits it in place — **Save** applies, **Escape** or **Cancel** discards, and **Enter** saves. One row is edited at a time.
-- The **×** on a row deletes that entry. **Clear all** empties the log.
+- **Clear all** empties everything — open tasks, the archive, and any running timer.
+- Logs made with the earlier version of this file are imported automatically the first time this page loads, as archived tasks. Nothing is deleted.
 - The log is per-browser, so it does not follow you between machines.
 
 ## Roadmap
 
 - Export the log to a real `.csv` file (download)
-- Track a date column so multi-day logs group cleanly in Excel
-- Named tasks / resume a recent task
 
 ## License
 
